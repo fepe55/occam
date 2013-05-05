@@ -1,0 +1,19 @@
+#INCLUDE "course.module"
+INT FUNCTION fib (VAL INT n)
+  INT fib.num, next.fib.num:
+  VALOF
+    SEQ
+      fib.num, next.fib.num := 0, 1
+      SEQ i = 0 FOR n
+        fib.num, next.fib.num := next.fib.num, (fib.num + next.fib.num)
+    RESULT fib.num
+:
+
+PROC imprimir (CHAN BYTE scr!)
+  SEQ n = 0 FOR 40
+    SEQ
+      out.int(n,0, scr!)
+      out.string (") ",0, scr!)
+      out.int(fib(n),0, scr!)
+      out.string (" - ",0, scr!)
+:

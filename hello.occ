@@ -1,0 +1,123 @@
+--Incluímos la librería Course para imprimir por pantalla
+#INCLUDE "course.module"
+
+PROC impresionesBasicas (CHAN BYTE out!)
+-- out.string(VAL []BYTE a, VAL INT b, CHAN BYTE c!):
+-- a: String a imprimir
+-- b: Ancho del campo para alinearlo a la derecha
+-- c: Canal al que vamos a escribir
+  SEQ
+    out.string ("Hello, world!", 0, out!)
+    out.string ("*n", 0, out!)
+    out.int (42, 0, out!)
+    out.string ("*n", 0, out!)
+:
+
+
+PROC tiposDefinidosPorUsuarios (CHAN BYTE out!)
+  DATA TYPE PUNTO
+    RECORD
+      INT x:
+      INT y:
+  :
+
+  [3]PUNTO TRIANGULO:
+  PUNTO p:
+
+  SEQ
+    p[x] := 10
+    p[y] := 12
+    out.int(p[x], 0, out!)
+    out.string ("*n", 0, out!)
+    out.int(p[y], 0, out!)
+    out.string ("*n", 0, out!)
+
+    TRIANGULO[0][x] := 1
+    TRIANGULO[0][y] := 2
+
+    TRIANGULO[1][x] := 3
+    TRIANGULO[1][y] := 4
+
+    TRIANGULO[2][x] := 5
+    TRIANGULO[2][y] := 6
+
+    out.int(TRIANGULO[1][x], 0, out!)
+    out.string ("*n", 0, out!)
+
+:
+
+PROC generoValores(CHAN INT generador!)
+  INT x:
+  SEQ
+    x:=0
+    WHILE x < 10
+      SEQ
+        x := x + 1
+        generador ! x
+:
+
+PROC imprimoValores(CHAN INT generador?, CHAN BYTE out!)
+  INT valor:
+
+  SEQ
+    valor := 0
+    WHILE valor < 10
+      SEQ
+        generador ? valor
+        out.int(valor,0,out!)
+        out.string ("*n", 0, out!)
+:
+
+PROC scopeEstatico(CHAN BYTE out!)
+  INT step :
+  SEQ
+    step := 39
+    PROC sumaStep (INT next, VAL INT num)
+      next := num + step
+    :
+    INT g, step :
+    SEQ
+      step := 7
+      sumaStep (g, 3)
+      out.string("Valor de g: ",0,out!)
+      out.int(g,0,out!)
+:
+
+PROC inferenciaDeTipos(INT numero1, INT numero2, CHAN INT in)
+  in ! numero1+numero2
+:
+
+PROC pruebas (CHAN BYTE out!)
+  CHAN INT generador:
+  --CHAN INT in:
+  --INT valor:
+  --INITIAL INT numero1 IS 2:
+  --INITIAL INT numero2 IS 7:
+
+  SEQ
+    out.string ("PRUEBAS*n",0, out!)
+    out.string ("-------*n",0, out!)
+    out.string ("Impresiones basicas*n",0, out!)
+    impresionesBasicas(out!)
+    out.string ("*n", 0, out!)
+    out.string ("Tipos definidos por el usuario*n",0, out!)
+    tiposDefinidosPorUsuarios(out!)
+    out.string ("*n", 0, out!)
+    out.string ("Generacion en paralelo de valores*n",0, out!)
+    PAR
+      generoValores(generador!)
+      imprimoValores(generador?, out!)
+    out.string("scopeEstatico*n",0,out!)
+    scopeEstatico(out!)
+    out.string ("*n", 0, out!)
+    --out.string ("Inferencia de tipos*n",0, out!)
+    --inferenciaDeTipos(numero1, numero2, in)
+    --out.string ("La suma es: ",0,out!)
+    --in ? valor
+    --out.int (valor, 0, out!)
+    --out.string ("*n", 0, out!)
+ 
+
+
+    --erase.screen (out!)
+:

@@ -1,0 +1,58 @@
+#INCLUDE "course.module"
+
+PROTOCOL FIB
+  CASE
+    quit
+    reset
+    give.num
+:
+
+
+PROC fib.gen (CHAN FIB in, CHAN INT out)
+  INT fib.num, next.fib.num:
+
+  PROC init()
+    fib.num, next.fib.num := 0, 1
+  :
+
+  SEQ
+    init()
+    INITIAL BOOL done IS FALSE:
+    WHILE NOT done
+      in ? CASE
+        quit
+          done := TRUE
+        reset
+          init()
+        give.num
+          SEQ
+            out ! fib.num
+            fib.num, next.fib.num := next.fib.num, (fib.num + next.fib.num)
+:
+
+PROC fib.test (CHAN BYTE scr!)
+  CHAN FIB tell.fib:
+  CHAN INT from.fib:
+
+  PROC fib.gen.print (VAL INT max.fib.num)
+    INT fib.num:
+
+    SEQ n = 0 FOR max.fib.num
+      SEQ
+        tell.fib ! give.num
+        from.fib ? fib.num
+        out.int(fib.num, 0, scr)
+        scr ! ' '
+  :
+
+  SEQ
+    PAR
+      fib.gen(tell.fib, from.fib)
+      SEQ
+        fib.gen.print(40)
+        scr ! '*n'
+        tell.fib ! reset
+        fib.gen.print(40)
+        scr ! '*n'
+        tell.fib ! quit
+:
